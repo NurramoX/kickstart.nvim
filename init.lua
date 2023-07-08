@@ -150,9 +150,9 @@ require('lazy').setup({
         section_separators = '',
       },
     },
-    config = function()
-      vim.opt.laststatus = 3
-    end
+    -- config = function()
+    --   vim.opt.laststatus = 3
+    -- end
   },
 
   {
@@ -235,6 +235,9 @@ vim.o.breakindent = true
 -- Save undo history
 vim.o.undofile = true
 
+-- Remove swapfile
+vim.o.swapfile = false
+
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
 vim.o.smartcase = true
@@ -254,9 +257,28 @@ vim.o.completeopt = 'menuone,noselect'
 vim.o.termguicolors = true
 
 -- Set CursorLineNr
-vim.cmd.highlight({ "CursorLineNr", "guifg=#50fa7b" })
+vim.cmd.highlight({ "CursorLineNr", "guifg=#ff79c6", "cterm=bold", "gui=bold" })
 vim.wo.cursorline = true
 vim.wo.cursorlineopt = "number"
+
+-- Set statusline
+vim.o.laststatus = 3
+
+-- Set scrolloff
+vim.o.scrolloff = 8
+
+-- Set expandtab
+vim.o.expandtab = true
+
+-- Set conceallevel
+vim.o.conceallevel = 2
+
+-- Set wrap
+vim.o.wrap = false
+
+-- Set splits
+vim.o.splitbelow = true
+vim.o.splitright = true
 
 -- [[ Basic Keymaps ]]
 
@@ -296,22 +318,27 @@ require('telescope').setup {
 pcall(require('telescope').load_extension, 'fzf')
 
 -- See `:help telescope.builtin`
-vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
-vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
+local builtin = require('telescope.builtin')
+
+vim.keymap.set('n', '<leader>?', builtin.oldfiles, { desc = '[?] Find recently opened files' })
+vim.keymap.set('n', '<leader><space>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
   -- You can pass additional configuration to telescope to change theme, layout, etc.
-  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+  builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
     winblend = 10,
     previewer = false,
   })
 end, { desc = '[/] Fuzzily search in current buffer' })
 
-vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
-vim.keymap.set('n', '<leader>pf', require('telescope.builtin').find_files, { desc = 'Search [P]roject [F]iles' })
-vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
+vim.keymap.set('n', '<leader>gf', builtin.git_files, { desc = 'Search [G]it [F]iles' })
+vim.keymap.set('n', '<leader>pf', builtin.find_files, { desc = 'Search [P]roject [F]iles' })
+vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+vim.keymap.set('n', '<leader>ps', function()
+  builtin.grep_string({ search = vim.fn.input("Grep > ") })
+end, { desc = '[P]rompted [S]earch' })
+
+
+vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -406,11 +433,11 @@ local on_attach = function(_, bufnr)
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
   nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
-  nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+  nmap('gr', builtin.lsp_references, '[G]oto [R]eferences')
   nmap('gI', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
   nmap('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+  nmap('<leader>ds', builtin.lsp_document_symbols, '[D]ocument [S]ymbols')
+  nmap('<leader>ws', builtin.lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -536,3 +563,8 @@ vim.api.nvim_set_keymap('n', '<C-l>', ':wincmd l<CR>', { noremap = true, silent 
 vim.api.nvim_set_keymap('n', '<C-h>', ':wincmd h<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<C-k>', ':wincmd k<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<C-j>', ':wincmd j<CR>', { noremap = true, silent = true })
+
+-- [[ Configure Neotree ]]
+
+vim.keymap.set('n', '<C-n>', function() vim.cmd("Neotree action=show toggle=true") end, { desc = "Toggle [N]eotree" })
+vim.api.nvim_set_keymap('n', '<Leader>pv', ':Neotree focus<CR>:only<CR>', { noremap = true, silent = true })

@@ -11,7 +11,5 @@ return {
   },
   config = function()
     require('neo-tree').setup {}
-    vim.keymap.set('n', '<C-n>', function() vim.cmd("Neotree action=show toggle=true") end, { desc = "Toggle [N]eotree" })
-    vim.api.nvim_set_keymap('n', '<Leader>pv', ':Neotree action=focus<CR>:only<CR>', { noremap = true, silent = true })
   end,
 }
