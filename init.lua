@@ -290,6 +290,11 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
+
+-- Remap for centering after scrolling
+vim.keymap.set('n', '<C-u>', '<C-u>zz', { silent = true })
+vim.keymap.set('n', '<C-f>', '<C-f>zz', { silent = true })
+
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
@@ -367,7 +372,7 @@ require('nvim-treesitter.configs').setup {
       keymaps = {
         -- You can use the capture groups defined in textobjects.scm
         ['aa'] = '@parameter.outer',
-        ['ia'] = '@parameter.inner',
+        ['ia'] = '@parmeter.inner',
         ['af'] = '@function.outer',
         ['if'] = '@function.inner',
         ['ac'] = '@class.outer',
@@ -567,4 +572,3 @@ vim.api.nvim_set_keymap('n', '<C-j>', ':wincmd j<CR>', { noremap = true, silent 
 -- [[ Configure Neotree ]]
 
 vim.keymap.set('n', '<C-n>', function() vim.cmd("Neotree action=show toggle=true") end, { desc = "Toggle [N]eotree" })
-vim.api.nvim_set_keymap('n', '<Leader>pv', ':Neotree focus<CR>:only<CR>', { noremap = true, silent = true })
