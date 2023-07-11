@@ -7,6 +7,7 @@ return {
       branch = "refresh-config"
     },
     "miversen33/netman.nvim",
+    "nvim-tree/nvim-web-devicons"
   },
   -- cmd = "Neotree",
   --keys = {
