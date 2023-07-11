@@ -3,7 +3,6 @@
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
 =====================================================================
-
 Kickstart.nvim is *not* a distribution.
 
 Kickstart.nvim is a template for your own configuration.
@@ -69,13 +68,15 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
+  'MunifTanjim/nui.nvim',
+
   -- Git related plugins
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
-
+ 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
-
+ 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   {
@@ -198,7 +199,7 @@ require('lazy').setup({
       vim.cmd.colorscheme 'dracula'
     end,
   },
-
+  
   {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
@@ -242,7 +243,7 @@ require('lazy').setup({
       },
     },
   },
-
+ 
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
@@ -276,6 +277,8 @@ vim.o.hlsearch = false
 
 -- Make line numbers default
 vim.wo.number = true
+vim.wo.relativenumber = true
+
 
 -- Enable mouse mode
 vim.o.mouse = 'a'
@@ -290,6 +293,9 @@ vim.o.breakindent = true
 
 -- Save undo history
 vim.o.undofile = true
+
+-- Remove swapfile
+vim.o.swapfile = false
 
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
@@ -308,8 +314,26 @@ vim.o.completeopt = 'menuone,noselect'
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
--- Nah, I'm gonna do my own thing :)
-vim.opt.laststatus = 3
+-- Set CursorLineNr
+vim.cmd.highlight({ "CursorLineNr", "guifg=#ff79c6", "cterm=bold", "gui=bold" })
+vim.wo.cursorline = true
+vim.wo.cursorlineopt = "number"
+
+-- Set statusline
+vim.o.laststatus = 3
+
+-- Set scrolloff
+vim.o.scrolloff = 8
+
+-- Set expandtab
+vim.o.expandtab = true
+
+-- Set conceallevel
+vim.o.conceallevel = 2
+
+-- Set wrap
+vim.o.wrap = false
+
 
 -- [[ Basic Keymaps ]]
 
@@ -337,7 +361,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = highlight_group,
   pattern = '*',
 })
-
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
 require('telescope').setup {
@@ -516,7 +539,7 @@ local on_attach = function(_, bufnr)
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  nmap('<C-S-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -660,3 +683,53 @@ cmp.setup {
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+
+-- set LSP borders :)
+local _border = "rounded"
+
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+  vim.lsp.handlers.hover, {
+    border = _border
+  }
+)
+
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
+  vim.lsp.handlers.signature_help, {
+    border = _border
+  }
+)
+
+vim.diagnostic.config{
+  float={border=_border}
+}
+
+require('lspconfig.ui.windows').default_options = {
+  border = _border
+}
+
+
+-- [[ Configure centering after scrolling ]]
+vim.keymap.set('n', '<C-u>', '<C-u>zz', { silent = true })
+vim.keymap.set('n', '<C-f>', '<C-f>zz', { silent = true })
+vim.keymap.set('n', '<S-g>', '<S-g>zz', { silent = true })
+
+
+
+-- [[ Configure window navigation ]]
+vim.api.nvim_set_keymap('n', '<C-l>', ':wincmd l<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-h>', ':wincmd h<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-k>', ':wincmd k<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-j>', ':wincmd j<CR>', { noremap = true, silent = true })
+
+-- [[ Configure Neotree ]]
+
+vim.keymap.set('n', '<C-n>', function() vim.cmd("Neotree action=show toggle=true") end, { desc = "Toggle [N]eotree" })
+
+vim.cmd([[
+  augroup neotree
+    autocmd!
+    autocmd BufEnter * if &filetype == 'neo-tree' | setlocal signcolumn=no | endif
+  augroup END
+]])
+
